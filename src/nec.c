@@ -21,7 +21,10 @@
  *******************************************************************************
  */
 #include "nec_config.h"
+#include <stdio.h>
+#include <stdlib.h>
 #include <tk/sys/syssig.h>
+#include <tk/io/net/netiface.h>
 
 static void nec_cleanup(void);
 static void nec_signals(int sig);
