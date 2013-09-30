@@ -1,0 +1,10 @@
+bin
+*~
+Makefile
+CMakeFiles
+CMakeCache*
+cmake_*
+#*
+.#*
+doc
+nec_config.h

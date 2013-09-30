@@ -1,0 +1,31 @@
+/**
+ *******************************************************************************
+ * @file nec_config.h
+ * @author Keidan
+ * @date 30/09/2013
+ * @par Project
+ * nec
+ *
+ * @par Copyright
+ * Copyright 2011-2013 Keidan, all right reserved
+ *
+ * This software is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY.
+ *
+ * Licence summary : 
+ *    You can modify and redistribute the sources code and binaries.
+ *    You can send me the bug-fix
+ *
+ * Term of the licence in in the file licence.txt.
+ *
+ *******************************************************************************
+ */
+#ifndef __NEC_CONFIG_H__
+  #define __NEC_CONFIG_H__
+
+  // the configured options and settings for NEC
+  #define NEC_VERSION_MAJOR @NEC_VERSION_MAJOR@
+  #define NEC_VERSION_MINOR @NEC_VERSION_MINOR@
+
+#endif /* __NEC_CONFIG_H__ */
+
