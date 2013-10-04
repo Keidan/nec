@@ -69,7 +69,7 @@ int main(int argc, char** argv) {
   syssig_add_signal(SIGINT, nec_signals);
   syssig_add_signal(SIGTERM, nec_signals);
 
-  int i, si = 1, count;
+  int i, si = 1, count = 0;
   int mtu = INVALID_INT, metric = INVALID_INT;
   _Bool all = 0, up = 0, updown = 0;
   char **keys;
@@ -82,6 +82,9 @@ int main(int argc, char** argv) {
   netiface_t iface;
 
   bzero(ip4, sizeof(netiface_ip4_t));
+  bzero(bcast, sizeof(netiface_ip4_t));
+  bzero(nmask, sizeof(netiface_ip4_t));
+  bzero(mac, sizeof(netiface_mac_t));
 
   ifaces = netiface_list_new(NETIFACE_LVL_UDP, NETIFACE_KEY_NAME);
 
