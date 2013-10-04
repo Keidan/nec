@@ -60,6 +60,24 @@ void usage(int err) {
   if(err != EXIT_FAILURE)
     fprintf(stdout, "Network config is a FREE software v%d.%d.\nCopyright 2011-2013 By kei\nLicense GPL.\n\n", NEC_VERSION_MAJOR, NEC_VERSION_MINOR);
   fprintf(stdout, "usage: nec options\n");
+  fprintf(stdout, "  - h or help: print this help\n");
+  fprintf(stdout, "  - List up ifaces: nec\n");
+  fprintf(stdout, "  - List all ifaces (down also): nec a    or nec all\n");
+  fprintf(stdout, "  - Up a specific iface (eg with eth0): nec eth0 up\n");
+  fprintf(stdout, "  - Down a specific iface (eg with eth0): nec eth0 down\n");
+  fprintf(stdout, "  - Update a specific iface (eg with eth0): nec eth0 192.168.0.10\n");
+  fprintf(stdout, "    With this mode you can specify some attributes\n");
+  fprintf(stdout, "    - broadcast addr\n");
+  fprintf(stdout, "    - netmask addr\n");
+  fprintf(stdout, "    - mac new_mac\n");
+  fprintf(stdout, "    - mtu value\n");
+  fprintf(stdout, "    - metric value\n");
+  fprintf(stdout, "      eg with all attributes:\n");
+  fprintf(stdout, "      nec eth0 192.168.0.10 broadcast 192.168.0.255 netmask 255.255.255.0 mac 00:10:01:10:01:00 mtu 1500 metric 1\n");
+  fprintf(stdout, "    You can also set or unset some flags (prefixed with + to add and - to remove):\n");
+  fprintf(stdout, "    - promisc, notrailers, debug, loopback, broadcast, multicast, master, slave, portsel, automedia, dynamic, running, pointopoint, noarp\n");
+  fprintf(stdout, "      eg with some flags:\n");
+  fprintf(stdout, "      nec eth0 +broadcast +multicast -debug\n");
   exit(err);
 }
 
@@ -88,6 +106,8 @@ int main(int argc, char** argv) {
 
   ifaces = netiface_list_new(NETIFACE_LVL_UDP, NETIFACE_KEY_NAME);
 
+  if(argc == 2 && (!strcmp(argv[1], "h") || !strcmp(argv[1], "help")))
+     usage(EXIT_SUCCESS);
   /* chec if the args correspond to: app iface */ 
   if(argc >= 2 && (iface = htable_lookup(ifaces, argv[1]))) {
      first_iface = 1;
@@ -116,20 +136,20 @@ int main(int argc, char** argv) {
       } else if(!strcmp(argv[i], "broadcast")) {
 	i++;
 	if(i == argc) {
-	  nlog("Invalid broadcast usage (no ip)!\n");
+	  nlog("Invalid broadcast usage (no broadcast)!\n");
 	  usage(EXIT_FAILURE);	  
 	} else if(!nettools_is_ipv4(argv[i])) {
-	  nlog("Invalid broadcast usage (invalid ip v4)!\n");
+	  nlog("Invalid broadcast usage (invalid broadcast)!\n");
 	  usage(EXIT_FAILURE);	  
 	}
 	strcpy(bcast, argv[i]);
       } else if(!strcmp(argv[i], "netmask")) {
 	i++;
 	if(i == argc) {
-	  nlog("Invalid netmask usage (no ip)!\n");
+	  nlog("Invalid netmask usage (no netmask)!\n");
 	  usage(EXIT_FAILURE);	  
 	} else if(!nettools_is_ipv4(argv[i])) {
-	  nlog("Invalid netmask usage (invalid ip v4)!\n");
+	  nlog("Invalid netmask usage (invalid netmask)!\n");
 	  usage(EXIT_FAILURE);	  
 	}
 	strcpy(nmask, argv[i]);	
