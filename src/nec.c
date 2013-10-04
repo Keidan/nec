@@ -113,7 +113,7 @@ int main(int argc, char** argv) {
       if(!strlen(ip4) && !first_iface && (!strcmp(argv[i], "all"))) {
 	all = 1;
 	break;
-      } else if(!strcmp(argv[i], "bcast")) {
+      } else if(!strcmp(argv[i], "broadcast")) {
 	i++;
 	if(i == argc) {
 	  nlog("Invalid broadcast usage (no ip)!\n");
