@@ -62,10 +62,11 @@ void usage(int err) {
   fprintf(stdout, "usage: nec options\n");
   fprintf(stdout, "  - h or help: print this help\n");
   fprintf(stdout, "  - List up ifaces: nec\n");
-  fprintf(stdout, "  - List all ifaces (down also): nec a    or nec all\n");
+  fprintf(stdout, "  - List all ifaces (down also): nec a or nec all\n");
   fprintf(stdout, "  - Up a specific iface (eg with eth0): nec eth0 up\n");
   fprintf(stdout, "  - Down a specific iface (eg with eth0): nec eth0 down\n");
   fprintf(stdout, "  - Update a specific iface (eg with eth0): nec eth0 192.168.0.10\n");
+  fprintf(stdout, "  - Create iface alias (eg with eth0): nec eth0:1 192.168.0.10\n");
   fprintf(stdout, "    With this mode you can specify some attributes\n");
   fprintf(stdout, "    - broadcast addr\n");
   fprintf(stdout, "    - netmask addr\n");
@@ -109,9 +110,12 @@ int main(int argc, char** argv) {
   if(argc == 2 && (!strcmp(argv[1], "h") || !strcmp(argv[1], "help")))
      usage(EXIT_SUCCESS);
   /* chec if the args correspond to: app iface */ 
-  if(argc >= 2 && (iface = htable_lookup(ifaces, argv[1]))) {
-     first_iface = 1;
-     si = 2;
+  if(argc >= 2) {
+    if((iface = htable_lookup(ifaces, argv[1]))) {
+      first_iface = 1;
+      si = 2;
+    } else if(string_indexof(argv[1], ":") != -1 && nettools_is_ipv4(argv[2]))
+      exit(netiface_create(argv[1], argv[2]));
   }
   /* chec if the args correspond to: app iface ip */
   if(argc >= 3 && nettools_is_ipv4(argv[2])) {
