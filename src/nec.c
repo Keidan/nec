@@ -114,8 +114,16 @@ int main(int argc, char** argv) {
     if((iface = htable_lookup(ifaces, argv[1]))) {
       first_iface = 1;
       si = 2;
-    } else if(string_indexof(argv[1], ":") != -1 && nettools_is_ipv4(argv[2]))
-      exit(netiface_create(argv[1], argv[2]));
+    } else if(string_indexof(argv[1], ":") != -1 && nettools_is_ipv4(argv[2])) {
+      if(netiface_create(argv[1], argv[2])) 
+	exit(EXIT_FAILURE);
+      netiface_list_delete(ifaces);
+      ifaces = netiface_list_new(NETIFACE_LVL_UDP, NETIFACE_KEY_NAME);
+      if((iface = htable_lookup(ifaces, argv[1]))) {
+	first_iface = 1;
+	si = 2;
+      }
+    }
   }
   /* chec if the args correspond to: app iface ip */
   if(argc >= 3 && nettools_is_ipv4(argv[2])) {
