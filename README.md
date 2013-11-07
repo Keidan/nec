@@ -3,6 +3,14 @@ nec
 
 (GPL) Network config is a FREE software.
 
+NEC software allows of:
+- Configure a network interface (MAC, MTU, Metric, IP, Broadcast, Subnet mask)
+- Modify the routing table.
+- Create aliases
+- Create virtual infterfaces TUN / TAP.
+
+
+
 This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY.
 
 Instructions
