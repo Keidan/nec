@@ -21,13 +21,14 @@
  *******************************************************************************
  */
 #include "nec_config.h"
+#include <tk/io/net/nettun.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
 #include <string.h>
 #include <tk/sys/syssig.h>
 #include <tk/utils/string.h>
-#include <tk/io/net/netiface.h>
+#include <tk/io/net/net.h>
 #include <tk/io/net/nettools.h>
 #include <limits.h>
 
@@ -65,8 +66,10 @@ void usage(int err) {
   fprintf(stdout, "  - List all ifaces (down also): nec a or nec all\n");
   fprintf(stdout, "  - Up a specific iface (eg with eth0): nec eth0 up\n");
   fprintf(stdout, "  - Down a specific iface (eg with eth0): nec eth0 down\n");
+  fprintf(stdout, "  - Delete tun/tap iface (eg with tap vpn): nec tap del vpn\n");
+  fprintf(stdout, "  - Create tun/tap iface (eg with tun vpn): nec tun add vpn\n");
   fprintf(stdout, "  - Update a specific iface (eg with eth0): nec eth0 192.168.0.10\n");
-  fprintf(stdout, "  - Create iface alias (eg with eth0): nec eth0:1 192.168.0.10\n");
+  fprintf(stdout, "  - Create iface alias (eg with eth0): nec eth0:1 192.168.0.10\n"); 
   fprintf(stdout, "    With this mode you can specify some attributes\n");
   fprintf(stdout, "    - broadcast addr\n");
   fprintf(stdout, "    - netmask addr\n");
@@ -122,6 +125,32 @@ int main(int argc, char** argv) {
       if((iface = htable_lookup(ifaces, argv[1]))) {
 	first_iface = 1;
 	si = 2;
+      }
+    } else if(!strcmp(argv[1], "tun") || !strcmp(argv[1], "tap")) {
+      if(argc < 3) {
+	nlog("Invalid argument number for this mode\n");
+	usage(EXIT_FAILURE);
+      }
+      int r;
+      nettun_type_t type = !strcmp(argv[1], "tap") ? NETTUN_TAP : NETTUN_TUN; 
+      if(!strcmp(argv[2], "del")) {
+	struct nettun_s nt;
+	strcpy(nt.name, argv[3]);
+	nt.type = type;
+	if((r = nettun_remove(&nt))) {
+	  if(errno)
+	    nlog("%s error: (%d) %s\n", argv[1], errno, strerror(errno));
+	}
+	return r;
+      } else if(!strcmp(argv[2], "add")) {
+	struct nettun_s nt;
+	strcpy(nt.name, argv[3]);
+	nt.type = type;
+	if((r = nettun_create(&nt))) {
+	  if(errno)
+	    nlog("%s error: (%d) %s\n", argv[1], errno, strerror(errno));
+	}
+	return r;
       }
     }
   }
