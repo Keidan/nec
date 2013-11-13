@@ -7,7 +7,7 @@ configure_file (
 
 
 set(bin_src 
-  ${NEC_SRC_DIR}/nec.c
+  ${NEC_SRC_DIR}/nec.c ${NEC_SRC_DIR}/nec_utils.c
 )
 add_executable(nec ${bin_src})
 target_link_libraries(nec tk)
