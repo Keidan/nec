@@ -36,6 +36,7 @@ void usage(int err) {
   fprintf(stdout, "  - h or help: print this help\n");
   usage_base();
   usage_tun();
+  usage_route();
   exit(err);
 }
 
@@ -45,11 +46,11 @@ int main(int argc, char** argv) {
   syssig_add_signal(SIGINT, nec_signals);
   syssig_add_signal(SIGTERM, nec_signals);
 
-
   if(argc == 2 && (!strcmp(argv[1], "h") || !strcmp(argv[1], "help")))
      usage(EXIT_SUCCESS);
 
   if(parse_tun(argc, argv)) return EXIT_SUCCESS;
+  if(parse_route(argc, argv)) return EXIT_SUCCESS;
   if(parse_base(argc, argv)) return EXIT_SUCCESS;
 
   return EXIT_FAILURE;

@@ -21,9 +21,28 @@
  *******************************************************************************
  */
 #include "nec_utils.h"
+#include <tk/utils/llist_iter.h>
 
 extern htable_t ifaces;
 extern void usage(int err);
+
+
+
+/**
+ * @fn void usage_route()
+ * @brief Print the route parts of the usage function.
+ */
+void usage_route() {
+  fprintf(stdout, "Route Management:\n");
+  fprintf(stdout, "  - List all routes: nec route\n");
+  fprintf(stdout, "  - Delete route: nec route del [options]\n");
+  fprintf(stdout, "  - Create route: nec route add [options]\n");
+  fprintf(stdout, "  - Possible route options:\n");
+  fprintf(stdout, "    - gw <addr>: Gateway address.\n");
+  fprintf(stdout, "    - dst <addr>: Destination address.\n");
+  fprintf(stdout, "    - mask <addr>: Destination mask address.\n");
+  fprintf(stdout, "    - src <iface_name>: Source interface name..\n");
+}
 
 /**
  * @fn void usage_tun()
@@ -64,6 +83,67 @@ void usage_base() {
 
 
 /**
+ * @fn _Bool parse_route(int argc, char** argv)
+ * @brief Parse the route arguments.
+ * @param argc Arguments count.
+ * @param argv Arguments value.
+ * @return 0 if the message is not aquired else 1.
+ */
+_Bool parse_route(int argc, char** argv) {
+  if(argc >= 2) {
+    if(!strcmp(argv[1], "route")) {
+      if(argc == 2) {
+	llist_t list = netroute_ls();
+	llist_iter_t it = llist_iter_alloc(list);
+	printf("%20s%20s%20s%20s\n", "Destination","Gateway","Interface","Source");
+	while(llist_iter_has_more(it)) {
+	  struct netroute_item_ls_s *i = (struct netroute_item_ls_s*)llist_value(llist_iter_next(it));
+	  printf("%20s%20s%20s%20s\n", i->dst, i->gateway, i->iface, i->src);
+	}
+	llist_iter_free(it);
+	llist_clear(&list);
+	return 1;
+      } else if(argc > 4 && (!strcmp(argv[2], "del") || !strcmp(argv[2], "add"))) {
+	struct netroute_item_add_s route;
+	bzero(&route, sizeof(struct netroute_item_add_s));
+	int i = 3;
+	for(; i < argc; i++) {
+	  if(!strcmp(argv[i], "gw"))
+	    strcpy(route.gateway, argv[++i]);
+	  else if(!strcmp(argv[i], "dst"))
+	    strcpy(route.dst, argv[++i]);
+	  else if(!strcmp(argv[i], "mask"))
+	    strcpy(route.dst_mask, argv[++i]);
+	  else if(!strcmp(argv[i], "src"))
+	    strcpy(route.src_iface, argv[++i]);
+	  else {
+	    nlog("Invalid argument '%s' for route mode\n", argv[i]);
+	    usage(EXIT_FAILURE);
+	  }
+	}
+	if(!strcmp(argv[2], "add")) {
+	  if(netroute_add(&route)) {
+	    if(errno)
+	      nlog("%s error: (%d) %s\n", argv[1], errno, strerror(errno));
+	  }
+	} else {
+	  if(netroute_del(&route)) {
+	    if(errno)
+	      nlog("%s error: (%d) %s\n", argv[1], errno, strerror(errno));
+	  }
+	}
+	return 1;
+      } else {
+	nlog("Invalid argument number or action for this mode\n");
+	usage(EXIT_FAILURE);
+      }
+    }
+  }
+  return 0;
+}
+
+
+/**
  * @fn _Bool parse_tun(int argc, char** argv)
  * @brief Parse the tun arguments.
  * @param argc Arguments count.
@@ -77,13 +157,12 @@ _Bool parse_tun(int argc, char** argv) {
 	nlog("Invalid argument number for this mode\n");
 	usage(EXIT_FAILURE);
       }
-      int r;
       nettun_type_t type = !strcmp(argv[1], "tap") ? NETTUN_TAP : NETTUN_TUN; 
       if(!strcmp(argv[2], "del")) {
 	struct nettun_s nt;
 	strcpy(nt.name, argv[3]);
 	nt.type = type;
-	if((r = nettun_remove(&nt))) {
+	if(nettun_remove(&nt)) {
 	  if(errno)
 	    nlog("%s error: (%d) %s\n", argv[1], errno, strerror(errno));
 	}
@@ -92,7 +171,7 @@ _Bool parse_tun(int argc, char** argv) {
 	struct nettun_s nt;
 	strcpy(nt.name, argv[3]);
 	nt.type = type;
-	if((r = nettun_create(&nt))) {
+	if(nettun_create(&nt)) {
 	  if(errno)
 	    nlog("%s error: (%d) %s\n", argv[1], errno, strerror(errno));
 	}
@@ -102,7 +181,6 @@ _Bool parse_tun(int argc, char** argv) {
   }
   return 0;
 }
-
 
 /**
  * @fn _Bool parse_base(int argc, char** argv)

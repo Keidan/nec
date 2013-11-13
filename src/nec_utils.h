@@ -61,6 +61,12 @@
   void usage_tun();
 
   /**
+   * @fn void usage_route()
+   * @brief Print the route parts of the usage function.
+   */
+  void usage_route();
+
+  /**
    * @fn void usage_base()
    * @brief Print the base parts of the usage function.
    */
@@ -74,6 +80,15 @@
    * @return 0 if the message is not aquired else 1.
    */
   _Bool parse_tun(int argc, char** argv);
+
+  /**
+   * @fn _Bool parse_route(int argc, char** argv)
+   * @brief Parse the route arguments.
+   * @param argc Arguments count.
+   * @param argv Arguments value.
+   * @return 0 if the message is not aquired else 1.
+   */
+  _Bool parse_route(int argc, char** argv);
 
   /**
    * @fn _Bool parse_base(int argc, char** argv)
