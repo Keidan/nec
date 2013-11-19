@@ -133,6 +133,9 @@ _Bool parse_route(int argc, char** argv) {
 	  }
 	}
 	return 1;
+      } else if(!strcmp(argv[2], "h") || !strcmp(argv[2], "help")) {
+	usage_route();
+	exit(0);
       } else {
 	nlog("Invalid argument number or action for this mode\n");
 	usage(EXIT_FAILURE);
@@ -153,6 +156,10 @@ _Bool parse_route(int argc, char** argv) {
 _Bool parse_tun(int argc, char** argv) {
   if(argc >= 2) {
     if(!strcmp(argv[1], "tun") || !strcmp(argv[1], "tap")) {
+      if(!strcmp(argv[2], "h") || !strcmp(argv[2], "help")) {
+	usage_tun();
+	exit(0);
+      }
       if(argc < 3) {
 	nlog("Invalid argument number for this mode\n");
 	usage(EXIT_FAILURE);
