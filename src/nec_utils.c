@@ -26,8 +26,10 @@
 
 extern htable_t ifaces;
 extern void usage(int err);
-
-
+extern ping_t ping;
+extern _Bool end_loop;
+static uint32_t ping_max_count = 0;
+static uint32_t ping_count = 1;
 
 /**
  * @fn void usage_ping()
@@ -35,8 +37,14 @@ extern void usage(int err);
  */
 void usage_ping() {
   fprintf(stdout, "Ping Management:\n");
-  fprintf(stdout, "  - Ping an address from a specific device: nec ping <iface> <address>\n");
-  fprintf(stdout, "    Ping an address from a specific device: nec ping <iface> <address> <timeout_in_sec>\n");
+  fprintf(stdout, "  - Ping an address from a specific device.\n");
+  fprintf(stdout, "  Possible uses:\n");
+  fprintf(stdout, "    nec ping <iface> <address>\n");
+  fprintf(stdout, "    nec ping <iface> <address> <count>\n");
+  fprintf(stdout, "    nec ping <iface> <address> <count> <timeout_in_sec>\n");
+  fprintf(stdout, "    Note:\n");
+  fprintf(stdout, "    if count = 0, infinite ping.\n");
+  fprintf(stdout, "    Default timeout value = 15 sec.\n");
 } 
 
 /**
@@ -412,9 +420,14 @@ _Bool parse_base(int argc, char** argv) {
 void ping_event_handler(ping_t p, struct ping_event_data_s data) {
   nlog("Ping result: %d - %s(%s)\n", data.result, data.host, data.ip);
   if(data.result == PING_RESULT_SUCCESS)
-    nlog("Ping ok (seq %d) in %d msec\n", data.seq, data.timestamp);
+    nlog("Ping ok (seq %d) in %.02f msec\n", data.seq, data.timestamp);
+  if(ping_max_count && ping_count == ping_max_count) {
+    end_loop = 1;
+    return;
+  }
   sleep(1);
-  ping_start(p, data.host, ping_get_timeout(p));
+  ping_start(p, data.host, data.timeout);
+  ping_count++;
 }
 
 /**
@@ -438,14 +451,21 @@ _Bool parse_ping(int argc, char** argv) {
       const char* iface = argv[2];
       const char* addr = argv[3];
       int timeout = 15;
-      if(argc > 4) {
+      if(argc == 5) {
 	if(!string_isint(argv[4])) {
+	  nlog("Invalid count value.\n");
+	  usage(EXIT_FAILURE);
+	}
+	ping_max_count = string_parse_int(argv[4], 0);
+      }
+      if(argc == 6) {
+	if(!string_isint(argv[5])) {
 	  nlog("Invalid timeout value.\n");
 	  usage(EXIT_FAILURE);
 	}
-	timeout = string_parse_int(argv[4], 15);
+	timeout = string_parse_int(argv[5], 15);
       }
-      ping_t ping = ping_new(iface);
+      ping = ping_new(iface);
       if(!ping) {
 	nlog("Unable to ping using the iface '%s'\n", iface);
 	usage(EXIT_FAILURE);

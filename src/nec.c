@@ -25,6 +25,8 @@
 #include <unistd.h>
 
 htable_t ifaces = NULL;
+ping_t ping = NULL;
+_Bool end_loop = 0;
 
 static void nec_cleanup(void);
 static void nec_signals(int sig);
@@ -53,7 +55,10 @@ int main(int argc, char** argv) {
 
   if(parse_tun(argc, argv)) return EXIT_SUCCESS;
   if(parse_route(argc, argv)) return EXIT_SUCCESS;
-  if(parse_ping(argc, argv)) while(1) sleep(1);
+  if(parse_ping(argc, argv)) {
+    while(!end_loop) sleep(1);
+    return EXIT_SUCCESS;
+  }
   if(parse_base(argc, argv)) return EXIT_SUCCESS;
 
   return EXIT_FAILURE;
@@ -66,6 +71,8 @@ static void nec_signals(int sig) {
 }
 
 static void nec_cleanup(void) {
+  end_loop = 1;
   if(ifaces)
     netiface_list_delete(ifaces), ifaces = NULL;
+  if(ping) ping_delete(ping), ping = NULL;
 }
