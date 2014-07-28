@@ -102,13 +102,13 @@ void usage_base() {
 
 
 /**
- * @fn _Bool parse_route(int argc, char** argv)
+ * @fn result_et parse_route(int argc, char** argv)
  * @brief Parse the route arguments.
  * @param argc Arguments count.
  * @param argv Arguments value.
- * @return 0 if the message is not aquired else 1.
+ * @return The result mode.
  */
-_Bool parse_route(int argc, char** argv) {
+result_et parse_route(int argc, char** argv) {
   if(argc >= 2) {
     if(!strcmp(argv[1], "route")) {
       if(argc == 2) {
@@ -121,7 +121,7 @@ _Bool parse_route(int argc, char** argv) {
 	}
 	llist_iter_free(it);
 	llist_clear(&list);
-	return 1;
+	return result_consume;
       } else if(argc > 4 && (!strcmp(argv[2], "del") || !strcmp(argv[2], "add"))) {
 	struct netroute_item_add_s route;
 	bzero(&route, sizeof(struct netroute_item_add_s));
@@ -151,33 +151,33 @@ _Bool parse_route(int argc, char** argv) {
 	      nlog("%s error: (%d) %s\n", argv[1], errno, strerror(errno));
 	  }
 	}
-	return 1;
+	return result_consume;
       } else if(!strcmp(argv[2], "h") || !strcmp(argv[2], "help")) {
 	usage_route();
-	exit(0);
+	exit(EXIT_SUCCESS);
       } else {
 	nlog("Invalid argument number or action for this mode\n");
 	usage(EXIT_FAILURE);
       }
     }
   }
-  return 0;
+  return result_next;
 }
 
 
 /**
- * @fn _Bool parse_tun(int argc, char** argv)
+ * @fn result_et parse_tun(int argc, char** argv)
  * @brief Parse the tun arguments.
  * @param argc Arguments count.
  * @param argv Arguments value.
- * @return 0 if the message is not aquired else 1.
+ * @return The result mode.
  */
-_Bool parse_tun(int argc, char** argv) {
+result_et parse_tun(int argc, char** argv) {
   if(argc >= 2) {
     if(!strcmp(argv[1], "tun") || !strcmp(argv[1], "tap")) {
       if(!strcmp(argv[2], "h") || !strcmp(argv[2], "help")) {
 	usage_tun();
-	exit(0);
+	exit(EXIT_SUCCESS);
       }
       if(argc < 3) {
 	nlog("Invalid argument number for this mode\n");
@@ -192,7 +192,7 @@ _Bool parse_tun(int argc, char** argv) {
 	  if(errno)
 	    nlog("%s error: (%d) %s\n", argv[1], errno, strerror(errno));
 	}
-	return 1;
+	return result_consume;
       } else if(!strcmp(argv[2], "add")) {
 	struct nettun_s nt;
 	strcpy(nt.name, argv[3]);
@@ -201,21 +201,21 @@ _Bool parse_tun(int argc, char** argv) {
 	  if(errno)
 	    nlog("%s error: (%d) %s\n", argv[1], errno, strerror(errno));
 	}
-	return 1;
+	return result_consume;
       }
     }
   }
-  return 0;
+  return result_next;
 }
 
 /**
- * @fn _Bool parse_base(int argc, char** argv)
+ * @fn result_et parse_base(int argc, char** argv)
  * @brief Parse the tun arguments.
  * @param argc Arguments count.
  * @param argv Arguments value.
- * @return 0 if the message is not aquired else 1.
+ * @return The result mode.
  */
-_Bool parse_base(int argc, char** argv) {
+result_et parse_base(int argc, char** argv) {
   int i, si = 1, count = 0;
   int mtu = INVALID_INT, metric = INVALID_INT;
   _Bool all = 0, up = 0, updown = 0;
@@ -413,7 +413,7 @@ _Bool parse_base(int argc, char** argv) {
     fprintf(stderr, "ERROR: Unable to change the device configuration: (%d) %s\n", errno, strerror(errno));
     exit(EXIT_FAILURE);
   }
-  return 1;
+  return result_consume;
 }
 
 
@@ -431,18 +431,18 @@ void ping_event_handler(ping_t p, struct ping_event_data_s data) {
 }
 
 /**
- * @fn _Bool parse_ping(int argc, char** argv)
+ * @fn result_et parse_ping(int argc, char** argv)
  * @brief Parse the tun arguments.
  * @param argc Arguments count.
  * @param argv Arguments value.
- * @return 0 if the message is not aquired else 1.
+ * @return The result mode.
  */
-_Bool parse_ping(int argc, char** argv) {
+result_et parse_ping(int argc, char** argv) {
   if(argc >= 2) {
     if(!strcmp(argv[1], "ping")) {
       if(!strcmp(argv[2], "h") || !strcmp(argv[2], "help")) {
-	usage_tun();
-	exit(0);
+	usage_ping();
+	exit(EXIT_SUCCESS);
       }
       if(argc < 4) {
 	nlog("Invalid argument number for this mode\n");
@@ -476,8 +476,8 @@ _Bool parse_ping(int argc, char** argv) {
 	nlog("Unable to ping the address '%s'\n", addr);
 	usage(EXIT_FAILURE);
       }
-      return 1;
+      return result_block;
     }
   }
-  return 0;
+  return result_next;
 }

@@ -45,6 +45,19 @@ void usage(int err) {
 }
 
 
+void manage_parser(result_et rs) {
+  switch(rs) {
+    case result_consume:
+      exit(EXIT_SUCCESS);
+      break;
+    case result_block:
+      while(!end_loop) sleep(1);
+      exit(EXIT_SUCCESS);
+      break;
+    case result_next: break;
+  }
+}
+
 int main(int argc, char** argv) {
   syssig_init(log_init_cast_user("nec", LOG_PID|LOG_CONS), nec_cleanup);
   syssig_add_signal(SIGINT, nec_signals);
@@ -52,14 +65,15 @@ int main(int argc, char** argv) {
 
   if(argc == 2 && (!strcmp(argv[1], "h") || !strcmp(argv[1], "help")))
      usage(EXIT_SUCCESS);
-
-  if(parse_tun(argc, argv)) return EXIT_SUCCESS;
-  if(parse_route(argc, argv)) return EXIT_SUCCESS;
-  if(parse_ping(argc, argv)) {
-    while(!end_loop) sleep(1);
-    return EXIT_SUCCESS;
-  }
-  if(parse_base(argc, argv)) return EXIT_SUCCESS;
+  printf("%d\n", __LINE__);
+  manage_parser(parse_tun(argc, argv));
+  printf("%d\n", __LINE__);
+  manage_parser(parse_route(argc, argv));
+  printf("%d\n", __LINE__);
+  manage_parser(parse_ping(argc, argv));
+  printf("%d\n", __LINE__);
+  manage_parser(parse_base(argc, argv));
+  printf("%d\n", __LINE__);
 
   return EXIT_FAILURE;
 }

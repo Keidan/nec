@@ -49,6 +49,12 @@
   })
 
   typedef enum {
+    result_next = 0,
+    result_consume = 1,
+    result_block = 2
+  }result_et;
+
+  typedef enum {
     _nset = -1,
     _false = 0,
     _true = 1
@@ -79,39 +85,39 @@
   void usage_base();
 
   /**
-   * @fn _Bool parse_tun(int argc, char** argv)
+   * @fn result_et parse_tun(int argc, char** argv)
    * @brief Parse the tun arguments.
    * @param argc Arguments count.
    * @param argv Arguments value.
-   * @return 0 if the message is not aquired else 1.
+   * @return The result mode.
    */
-  _Bool parse_tun(int argc, char** argv);
+  result_et parse_tun(int argc, char** argv);
 
   /**
-   * @fn _Bool parse_route(int argc, char** argv)
+   * @fn result_et parse_route(int argc, char** argv)
    * @brief Parse the route arguments.
    * @param argc Arguments count.
    * @param argv Arguments value.
-   * @return 0 if the message is not aquired else 1.
+   * @return The result mode.
    */
-  _Bool parse_route(int argc, char** argv);
+  result_et parse_route(int argc, char** argv);
 
   /**
-   * @fn _Bool parse_ping(int argc, char** argv)
+   * @fn result_et parse_ping(int argc, char** argv)
    * @brief Parse the ping arguments.
    * @param argc Arguments count.
    * @param argv Arguments value.
-   * @return 0 if the message is not aquired else 1.
+   * @return The result mode.
    */
-  _Bool parse_ping(int argc, char** argv);
+  result_et parse_ping(int argc, char** argv);
 
   /**
-   * @fn _Bool parse_base(int argc, char** argv)
+   * @fn result_et parse_base(int argc, char** argv)
    * @brief Parse the tun arguments.
    * @param argc Arguments count.
    * @param argv Arguments value.
-   * @return 0 if the message is not aquired else 1.
+   * @return The result mode.
    */
-  _Bool parse_base(int argc, char** argv);
+  result_et parse_base(int argc, char** argv);
 
 #endif /* __NEC_UTILS_H__ */
