@@ -5,7 +5,7 @@ set(tk_prefix lib/tk/)
 exec_program(${CMAKE_COMMAND} ${tk_prefix}
   ARGS
   -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DDISTRIBUTION=${DISTRIBUTION} 
-  -DDISABLE_ZLIB=yes -DDISABLE_TERMIOS=yes -DDISABLE_NCURSES=yes
+  -DDISABLE_ZLIB=yes -DDISABLE_TERMIOS=yes -DDISABLE_NCURSES=yes -DDISABLE_LUA=yes
 )
 # Creation of tk targets
 add_custom_target(libtk 
