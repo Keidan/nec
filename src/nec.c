@@ -7,7 +7,7 @@
  * nec
  *
  * @par Copyright
- * Copyright 2011-2013 Keidan, all right reserved
+ * Copyright 2011-2014 Keidan, all right reserved
  *
  * This software is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY.
@@ -22,6 +22,7 @@
  */
 #include "nec_utils.h"
 #include <tk/sys/syssig.h>
+#include <unistd.h>
 
 htable_t ifaces = NULL;
 
@@ -37,6 +38,7 @@ void usage(int err) {
   usage_base();
   usage_tun();
   usage_route();
+  usage_ping();
   exit(err);
 }
 
@@ -51,6 +53,7 @@ int main(int argc, char** argv) {
 
   if(parse_tun(argc, argv)) return EXIT_SUCCESS;
   if(parse_route(argc, argv)) return EXIT_SUCCESS;
+  if(parse_ping(argc, argv)) while(1) sleep(1);
   if(parse_base(argc, argv)) return EXIT_SUCCESS;
 
   return EXIT_FAILURE;

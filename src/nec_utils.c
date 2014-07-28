@@ -22,11 +22,22 @@
  */
 #include "nec_utils.h"
 #include <tk/utils/llist_iter.h>
+#include <unistd.h>
 
 extern htable_t ifaces;
 extern void usage(int err);
 
 
+
+/**
+ * @fn void usage_ping()
+ * @brief Print the ping parts of the usage function.
+ */
+void usage_ping() {
+  fprintf(stdout, "Ping Management:\n");
+  fprintf(stdout, "  - Ping an address from a specific device: nec ping <iface> <address>\n");
+  fprintf(stdout, "    Ping an address from a specific device: nec ping <iface> <address> <timeout_in_sec>\n");
+} 
 
 /**
  * @fn void usage_route()
@@ -395,4 +406,58 @@ _Bool parse_base(int argc, char** argv) {
     exit(EXIT_FAILURE);
   }
   return 1;
+}
+
+
+void ping_event_handler(ping_t p, struct ping_event_data_s data) {
+  nlog("Ping result: %d - %s(%s)\n", data.result, data.host, data.ip);
+  if(data.result == PING_RESULT_SUCCESS)
+    nlog("Ping ok (seq %d) in %d msec\n", data.seq, data.timestamp);
+  sleep(1);
+  ping_start(p, data.host, ping_get_timeout(p));
+}
+
+/**
+ * @fn _Bool parse_ping(int argc, char** argv)
+ * @brief Parse the tun arguments.
+ * @param argc Arguments count.
+ * @param argv Arguments value.
+ * @return 0 if the message is not aquired else 1.
+ */
+_Bool parse_ping(int argc, char** argv) {
+  if(argc >= 2) {
+    if(!strcmp(argv[1], "ping")) {
+      if(!strcmp(argv[2], "h") || !strcmp(argv[2], "help")) {
+	usage_tun();
+	exit(0);
+      }
+      if(argc < 4) {
+	nlog("Invalid argument number for this mode\n");
+	usage(EXIT_FAILURE);
+      }
+      const char* iface = argv[2];
+      const char* addr = argv[3];
+      int timeout = 15;
+      if(argc > 4) {
+	if(!string_isint(argv[4])) {
+	  nlog("Invalid timeout value.\n");
+	  usage(EXIT_FAILURE);
+	}
+	timeout = string_parse_int(argv[4], 15);
+      }
+      ping_t ping = ping_new(iface);
+      if(!ping) {
+	nlog("Unable to ping using the iface '%s'\n", iface);
+	usage(EXIT_FAILURE);
+      }
+      ping_set_event_handler(ping, ping_event_handler, NULL);
+      if(ping_start(ping, addr, timeout)) {
+	ping_delete(ping);
+	nlog("Unable to ping the address '%s'\n", addr);
+	usage(EXIT_FAILURE);
+      }
+      return 1;
+    }
+  }
+  return 0;
 }

@@ -30,7 +30,7 @@ add_custom_target(doxygen
 )
 # The version number.
 set (NEC_VERSION_MAJOR 1)
-set (NEC_VERSION_MINOR 2)
+set (NEC_VERSION_MINOR 3)
 
 # To produce x86_64 binaries
 if("${CMAKE_BUILD_TYPE}" MATCHES "x86_64")
