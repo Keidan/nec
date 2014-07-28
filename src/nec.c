@@ -65,15 +65,11 @@ int main(int argc, char** argv) {
 
   if(argc == 2 && (!strcmp(argv[1], "h") || !strcmp(argv[1], "help")))
      usage(EXIT_SUCCESS);
-  printf("%d\n", __LINE__);
+
   manage_parser(parse_tun(argc, argv));
-  printf("%d\n", __LINE__);
   manage_parser(parse_route(argc, argv));
-  printf("%d\n", __LINE__);
   manage_parser(parse_ping(argc, argv));
-  printf("%d\n", __LINE__);
   manage_parser(parse_base(argc, argv));
-  printf("%d\n", __LINE__);
 
   return EXIT_FAILURE;
 }
