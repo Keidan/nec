@@ -8,7 +8,7 @@ NEC software allows of:
 - Modify the routing table.
 - Create aliases
 - Create virtual infterfaces TUN / TAP.
-
+- Ping an address
 
 
 This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY.
